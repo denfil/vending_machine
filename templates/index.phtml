@@ -1,0 +1,92 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>Vending machine</title>
+</head>
+<body>
+<div class="container">
+    <div class="container"><br>
+        <div id="products" class="row">
+            <?php foreach ($products as $product) { ?>
+            <div class="col-sm">
+                <button type="button" class="btn btn-secondary" data-product-id="<?= $product->getId(); ?>">
+                    <?= $product->getName(); ?><br>
+                    <?= $product->getPrice(); ?> rub
+                </button><br>
+                <p class="badge badge-light">
+                    <span class="product-qty"><?= $product->getQuantity(); ?></span> cups
+                </p>
+            </div>
+            <?php } ?>
+        </div><br>
+        <div class="row">
+            <div class="col-sm">
+                <h6>Machine Wallet</h6>
+                <?php foreach ($machineWallet->getCoins() as $coin) { ?>
+                <div id="m-coin-<?= $coin->getValue(); ?>">
+                      <span class="badge badge-pill badge-warning"><?= $coin->getValue(); ?></span> rub
+                      &times; <span class="coin-qty"><?= $coin->getQuantity(); ?></span> pcs
+                  </div>
+                <?php } ?>
+                <br><div>
+                    Total: <span id="m-total"><?= $machineWallet->getTotal(); ?></span> rub
+                </div>
+            </div>
+            <div class="col-sm">
+                <h6>Deposit Balance</h6>
+                <h2><span id="in"><?= $depositAccount->getBalance(); ?></span> rub</h2>
+                <button id="withdraw" type="button" class="btn btn-success">Withdraw</button>
+            </div>
+            <div id="customer-wallet" class="col-sm">
+                <h6>Customer Wallet</h6>
+                <?php foreach ($customerWallet->getCoins() as $coin) { ?>
+                <div>
+                    <button type="button" class="badge btn btn-primary btn-sm" data-value="<?= $coin->getValue(); ?>">deposit</button>
+                    <span class="badge badge-pill badge-warning"><?= $coin->getValue(); ?></span> rub
+                    &times; <span class="coin-qty"><?= $coin->getQuantity(); ?></span> pcs
+                </div>
+                <?php } ?>
+                <br><div>
+                    Total: <span id="c-total"><?= $customerWallet->getTotal(); ?></span> rub
+                </div>
+            </div>
+        </div>
+        <br><br><br><button id="reset" type="button" class="btn btn-sm btn-danger">Reset</button>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script>
+$(function () {
+    function ajaxRequest(url) {
+        $.getJSON(url, function (result) {
+            if (result.error) {
+                alert(result.error);
+                return false;
+            }
+            window.location.href = '/';
+        });
+    }
+    $("#customer-wallet button").click(function () {
+        var url = "/deposit/" + $(this).data("value");
+        ajaxRequest(url);
+    });
+    $("#products button").click(function () {
+        var url = "/buy/" + $(this).data("product-id");
+        ajaxRequest(url);
+    });
+    $("#withdraw").click(function () {
+        ajaxRequest("/withdraw");
+    });
+    $("#reset").click(function () {
+        ajaxRequest("/reset");
+    });
+});
+</script>
+</body>
+</html>
